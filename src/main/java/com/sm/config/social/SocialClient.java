@@ -8,10 +8,7 @@ import com.sm.common.exception.GenericErrorException;
 import com.sm.common.util.DateUtil;
 import com.sm.common.util.SecureStringUtil;
 import com.sm.config.social.ios.IOSClient;
-import com.sm.config.social.user.FacebookUser;
-import com.sm.config.social.user.GoogleUser;
-import com.sm.config.social.user.IOSInfo;
-import com.sm.config.social.user.LinkedinInfo;
+import com.sm.config.social.user.*;
 import com.sm.controller.dto.request.SocialRequestModel;
 import com.sm.dto.response.user.UserDto;
 import org.json.JSONObject;
@@ -65,6 +62,7 @@ public class SocialClient {
             variables.put("access_token", accessToken);
             FacebookUser facebookUser = restTemplate.getForObject(FACEBOOK_GRAPH_API_BASE + FACEBOOK_PATH, FacebookUser.class, variables);
             userDto = convertTo(facebookUser);
+            userDto.setProvider("facebook");
         }catch (Exception e){
             logger.error("While fetching facebook data, getting Exception :",e);
             throw new GenericErrorException(ErrorType.TOKEN_BAD_REQUEST.getCode(),ErrorType.TOKEN_BAD_REQUEST.getMessage(),e);
@@ -88,6 +86,7 @@ public class SocialClient {
             variables.put("id_token", accessToken);
             GoogleUser googleUser = restTemplate.getForObject(GOOGLE_API_BASE + GOOGLE_PATH, GoogleUser.class, variables);
             userDto = convertTo(googleUser);
+            userDto.setProvider("google");
         }catch (Exception e){
             logger.error("While fetching google data, getting Exception :",e);
             throw new GenericErrorException(ErrorType.TOKEN_BAD_REQUEST.getCode(),ErrorType.TOKEN_BAD_REQUEST.getMessage(),e);
@@ -113,6 +112,7 @@ public class SocialClient {
 
         IOSInfo appleInfo =appleClient.retrieveData(clientSecret, socialRequestModel.getToken());
         userDto = convertTo(appleInfo);
+        userDto.setProvider("apple");
 
         if(socialRequestModel.getFirstName() != null)
             userDto.setFirstName(socialRequestModel.getFirstName());
@@ -123,10 +123,15 @@ public class SocialClient {
     }
 
 
+    /**
+     * fetch linkedin user data and convert to UserDto
+     * @param authorizationCode
+     * @return
+     */
     public UserDto getLinkedinInfo(String authorizationCode){
         String redirectUrl = "http://localhost:8080/home";
-        String clientId = "abcdef";
-        String clientSecret = "helloworld";
+        String clientId = "hello";
+        String clientSecret = "world";
         //authorization code for access token
         String accessTokenUri ="https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code="+authorizationCode+"&redirect_uri="+redirectUrl+"&client_id="+clientId+"&client_secret="+clientSecret+"";
         String accessTokenRequest = restTemplate.getForObject(accessTokenUri, String.class);
@@ -154,10 +159,17 @@ public class SocialClient {
         }
 
         linkedinInfo = getLinkedinEmailInfo(entity, linkedinInfo);
-        return convertTo(linkedinInfo);
-
+        UserDto userDto = convertTo(linkedinInfo);
+        userDto.setProvider("linkedin");
+        return userDto;
     }
 
+    /**
+     * get email from linkedin
+     * @param entity
+     * @param linkedinInfo
+     * @return
+     */
     private LinkedinInfo getLinkedinEmailInfo(HttpEntity<String> entity, LinkedinInfo linkedinInfo) {
         ResponseEntity<String> linkedinDetailRequest;
         String emailUri = "https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))";
@@ -170,46 +182,20 @@ public class SocialClient {
         return linkedinInfo;
     }
 
-    private UserDto convertTo(FacebookUser facebookUser) {
+    /**
+     * Create user data from social platform
+     * @param genericUser
+     * @return
+     */
+    private UserDto convertTo(GenericUser genericUser) {
         UserDto userDto = new UserDto();
-        userDto.setProviderId(facebookUser.getId());
-        userDto.setProvider("facebook");
-        userDto.setEmail(facebookUser.getEmail());
-        userDto.setFirstName(facebookUser.getFirstName());
-        userDto.setLastName(facebookUser.getLastName());
+        userDto.setProviderId(genericUser.getId());
+        userDto.setEmail(genericUser.getEmail());
+        userDto.setFirstName(genericUser.getFirstName());
+        userDto.setLastName(genericUser.getLastName());
+        userDto.setGender(genericUser.getGender());
         userDto.setPassword(SecureStringUtil.randomString(30));
         return userDto;
     }
 
-    private UserDto convertTo(GoogleUser googleUser) {
-        UserDto userDto = new UserDto();
-        userDto.setProviderId(googleUser.getSub());
-        userDto.setProvider("google");
-        userDto.setEmail(googleUser.getEmail());
-        userDto.setFirstName(googleUser.getGivenName());
-        userDto.setLastName(googleUser.getFamilyName());
-        userDto.setPassword(SecureStringUtil.randomString(30));
-        userDto.setPicture(googleUser.getPicture());
-        return userDto;
-    }
-
-    private UserDto convertTo(IOSInfo appleInfo) {
-        UserDto userDto = new UserDto();
-        userDto.setProviderId(appleInfo.getId());
-        userDto.setProvider("ios");
-        userDto.setEmail(appleInfo.getEmail());
-        userDto.setPassword(SecureStringUtil.randomString(30));
-        return userDto;
-    }
-
-    private UserDto convertTo(LinkedinInfo linkedinInfo) {
-        UserDto userDto = new UserDto();
-        userDto.setProviderId(linkedinInfo.getId());
-        userDto.setProvider("linkedin");
-        userDto.setEmail(linkedinInfo.getEmail());
-        userDto.setFirstName(linkedinInfo.getLocalizedFirstName());
-        userDto.setLastName(linkedinInfo.getLocalizedLastName());
-        userDto.setPassword(SecureStringUtil.randomString(30));
-        return userDto;
-    }
 }

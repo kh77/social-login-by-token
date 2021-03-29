@@ -1,46 +1,15 @@
 package com.sm.config.social.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LinkedinInfo {
-    private String id;
-    private String localizedFirstName;
-    private String localizedLastName;
-    private String email;
+public class LinkedinInfo extends GenericUser {
+
+    @JsonProperty("localizedFirstName")
+    private String firstName;
+    @JsonProperty("localizedLastName")
+    private String lastName;
 
     public LinkedinInfo(){}
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getLocalizedFirstName() {
-        return localizedFirstName;
-    }
-
-    public void setLocalizedFirstName(String localizedFirstName) {
-        this.localizedFirstName = localizedFirstName;
-    }
-
-    public String getLocalizedLastName() {
-        return localizedLastName;
-    }
-
-    public void setLocalizedLastName(String localizedLastName) {
-        this.localizedLastName = localizedLastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
 }

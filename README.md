@@ -1,6 +1,6 @@
 # Validate Social login token at back-end and get profile information
 
-# Social Login (IOS, Google, Facebook)
+# Social Login (IOS, Google, Facebook, Linkedin)
 - Create Web Project in developer console of social platform 
 - Using developer console and get the access token then hit the API
 
@@ -15,15 +15,17 @@
   - Exchange authorization code for token then you will get id_token
     
 
--- Linkedin 
+- Linkedin 
   - https://www.linkedin.com/developers
   - Get client id and secret 
   - Hit below url to get code and use this code in request body for token field
   - https://www.linkedin.com/oauth/v2/authorization?client_id=helloworld&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fhome&response_type=code&state=abcdef&scope=r_liteprofile%20r_emailaddress
   - No playground has been found for linkedin
 
+
 - Swagger
   - http://localhost:8080/app/swagger-ui.html
+
 
 
 - For Facebook 
@@ -34,12 +36,14 @@
       }
 
 
+
 - For Google
   - Request body
     - {
         "provider": "google",
         "token": " Get id token from Playground "
       }
+
 
 
 - For Linkedin
