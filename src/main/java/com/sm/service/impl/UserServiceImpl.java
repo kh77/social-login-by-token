@@ -41,6 +41,8 @@ public class UserServiceImpl implements UserService {
             // implement above comments to set the value in clientSecret. Initially, it will be null
             String clientSecret = null;
             userDto = socialClient.getAppleUser(socialRequestModel, clientSecret);
+        } else if (provider.equalsIgnoreCase("linkedin")) {
+            userDto = socialClient.getLinkedinInfo(socialRequestModel.getToken());
         }
         UserDto userResponse = createUserSocial(userDto);
         return userResponse;

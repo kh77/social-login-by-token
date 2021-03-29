@@ -11,7 +11,7 @@ public class SocialRequestModel {
 
 	@NotBlank(message="NOT_BLANK")
 	@NotEmpty(message="NOT_BLANK")
-	@Pattern(regexp = "^(facebook|google|apple)$",flags = Pattern.Flag.CASE_INSENSITIVE, message = "PROVIDER_NOT_EMPTY")
+	@Pattern(regexp = "^(facebook|google|apple|linkedin)$",flags = Pattern.Flag.CASE_INSENSITIVE, message = "PROVIDER_NOT_EMPTY")
 	private String provider;
 
 	private String firstName;
